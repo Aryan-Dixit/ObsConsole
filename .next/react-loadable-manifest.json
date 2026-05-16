@@ -1,0 +1,14 @@
+{
+  "lib\\telemetry.js -> idb-keyval": {
+    "id": "lib\\telemetry.js -> idb-keyval",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_idb-keyval_dist_index_js.js"
+    ]
+  },
+  "lib\\telemetry.js -> web-vitals": {
+    "id": "lib\\telemetry.js -> web-vitals",
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_web-vitals_dist_web-vitals_js.js"
+    ]
+  }
+}

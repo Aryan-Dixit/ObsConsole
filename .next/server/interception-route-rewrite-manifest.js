@@ -1,0 +1,1 @@
+self.__INTERCEPTION_ROUTE_REWRITE_MANIFEST="[{\"source\":\"/t/:tenant/projects/:id\",\"destination\":\"/t/__NEXT_EMPTY_PARAM__/projects/(..)projects/:id\",\"has\":[{\"type\":\"header\",\"key\":\"Next-Url\",\"value\":\"\\\\/t(?:\\\\/([^\\\\/#\\\\?]+?))\\\\/projects(?:\\\\/(.*))?[\\\\/#\\\\?]?\"}]}]"
