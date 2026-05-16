@@ -1,0 +1,33 @@
+{
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Use any demo account below",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in...",
+    "demoTitle": "Demo accounts (password: \"password\")",
+    "roles": { "owner": "owner", "editor": "editor", "viewer": "viewer" },
+    "error": { "invalid": "Invalid credentials", "network": "Network error" }
+  },
+  "nav": {
+    "live": "Live",
+    "dash": "Dashboard",
+    "telemetry": "Telemetry",
+    "signOut": "Sign out"
+  },
+  "live": {
+    "waiting": "Waiting for events...",
+    "paused": "Stream paused",
+    "jumpToLive": "Jump to live",
+    "pause": "Pause",
+    "resume": "Resume",
+    "filterAll": "ALL",
+    "searchPlaceholder": "Search messages, hosts...",
+    "ringWarning": "Ring buffer {pct}% full — coalescing events to maintain INP <200ms"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong"
+  }
+}
