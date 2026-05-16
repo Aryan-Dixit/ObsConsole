@@ -35,6 +35,10 @@ Open http://localhost:3000 → sign in → **admin@acme.com / password**
 
 ---
 
+*Post Live Deployment links for Vercel and Railway(For Express/Websocket Server)*
+- https://obsconsole-production.up.railway.app/api/tenants
+- https://obs-console-dsauz8sve-aryandixits-projects.vercel.app/login
+
 ## File Structure
 
 ```
