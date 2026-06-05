@@ -147,7 +147,15 @@ function makeBurstGen(serviceId, baseMsgPerSec, onEvent) {
 
 // ── Express setup ────────────────────────────────────────────────────────────
 const app = express()
-app.use(cors({ origin: ['http://localhost:3000'], credentials: true }))
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://obs-console.vercel.app/',  
+    /\.vercel\.app$/,                      
+  ],
+  credentials: true,
+}))
+
 app.use(express.json())
 app.use(cookieParser())
 
