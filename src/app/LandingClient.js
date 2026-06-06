@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '../store/auth'
 
@@ -23,26 +24,43 @@ function TenantSkeleton() {
 }
 
 export default function LandingClient() {
-  const { accessToken, refresh } = useAuth()
+  const { accessToken, loading, refresh } = useAuth()
+  const router = useRouter()
   const [tenants, setTenants] = useState(null)
-  const [error, setError] = useState(null)
+  const [error, setError]     = useState(null)
 
+  // Client-side auth guard — redirect to login if no session after load
   useEffect(() => {
-    if (!accessToken) {
-      refresh().catch(() => {})
-      return
+    if (!loading && !accessToken) {
+      router.replace('/login')
     }
+  }, [loading, accessToken, router])
+
+  // Fetch tenants once we have the access token
+  useEffect(() => {
+    if (!accessToken) return
     fetch(`${API}/api/tenants`, {
       headers: { Authorization: `Bearer ${accessToken}` },
       credentials: 'include',
     })
       .then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status} — is the mock server running? (npm run dev:mock)`)
+        if (!r.ok) throw new Error(`HTTP ${r.status} — is the mock server running?`)
         return r.json()
       })
       .then(d => setTenants(d.items || []))
       .catch(e => setError(e.message))
-  }, [accessToken, refresh])
+  }, [accessToken])
+
+  // Show nothing while auth is resolving (prevents flash of login redirect)
+  if (loading) return (
+    <div style={{ minHeight:'100vh', background:'#030712', display:'flex',
+      alignItems:'center', justifyContent:'center',
+      fontFamily:'JetBrains Mono, monospace', color:'#475569' }}>
+      Loading...
+    </div>
+  )
+
+  if (!accessToken) return null  // redirecting to login
 
   return (
     <div style={{ minHeight:'100vh', background:'#030712', color:'#cbd5e1',
@@ -69,7 +87,6 @@ export default function LandingClient() {
           Select a tenant to view projects and live service streams.
         </p>
 
-        {/* Error state — actionable message */}
         {error && (
           <div role="alert" aria-live="assertive" style={{
             color:'#f87171', fontSize:12, background:'#160000',
@@ -77,24 +94,16 @@ export default function LandingClient() {
             padding:'10px 14px', marginBottom:16, lineHeight:1.6
           }}>
             <strong>Could not load tenants.</strong><br />
-            {error}<br />
-            <span style={{ color:'#fbbf24' }}>
-              Make sure the mock server is running: <code>npm run dev:mock</code>
-            </span>
+            {error}
           </div>
         )}
 
-        {/* Loading skeleton */}
         {tenants === null && !error && <TenantSkeleton />}
 
-        {/* Empty state */}
         {tenants !== null && tenants.length === 0 && !error && (
-          <p style={{ color:'#475569', fontSize:13 }}>
-            No tenants returned by the API.
-          </p>
+          <p style={{ color:'#475569', fontSize:13 }}>No tenants returned by the API.</p>
         )}
 
-        {/* Tenant cards */}
         {tenants !== null && tenants.length > 0 && (
           <div role="list" aria-label="Tenant list"
             style={{ display:'grid',
