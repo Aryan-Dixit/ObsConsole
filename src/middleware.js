@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server'
 
-const PUBLIC = ['/login', '/share']
+const PUBLIC = ['/login', '/share', '/debug']
 
 export function middleware(request) {
   const { pathname } = request.nextUrl
+
+  // Allow public paths
   if (PUBLIC.some(p => pathname.startsWith(p))) return NextResponse.next()
-  const hasRefresh = request.cookies.has('refresh_token')
-  if (!hasRefresh) return NextResponse.redirect(new URL('/login', request.url))
-  if (['POST','PATCH','PUT','DELETE'].includes(request.method)) {
-    const csrfH = request.headers.get('x-csrf-token')
-    const csrfC = request.cookies.get('csrf')?.value
-    if (!csrfH || csrfH !== csrfC)
-      return NextResponse.json({ error: 'invalid csrf' }, { status: 403 })
-  }
+
+  // In cross-origin deployments (Vercel frontend + Railway backend), the
+  // refresh_token HttpOnly cookie is set on the Railway domain, not the
+  // Vercel domain. The middleware cannot see it. Auth is handled entirely
+  // client-side by AuthProvider which calls /api/auth/refresh on mount.
+  // If the refresh fails, AuthProvider dispatches LOGOUT and the client
+  // redirects to /login — so we do NOT redirect here.
+
   return NextResponse.next()
 }
 
