@@ -147,15 +147,22 @@ function makeBurstGen(serviceId, baseMsgPerSec, onEvent) {
 
 // ── Express setup ────────────────────────────────────────────────────────────
 const app = express()
+const isProd = process.env.NODE_ENV === 'production'
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://obs-console.vercel.app/',  
-    /\.vercel\.app$/,                      
-  ],
+  origin: (origin, callback) => {
+    // No origin = curl / Postman / server-to-server
+    if (!origin) return callback(null, true)
+    // Always allow localhost
+    if (origin.includes('localhost')) return callback(null, true)
+    // Allow any Railway or Vercel deployment automatically
+    if (origin.includes('.up.railway.app') || origin.includes('.vercel.app')) return callback(null, true)
+    // Allow explicit FRONTEND_URL env var for custom domains
+    if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) return callback(null, true)
+    callback(new Error('CORS: origin not allowed: ' + origin))
+  },
   credentials: true,
 }))
-
 app.use(express.json())
 app.use(cookieParser())
 
@@ -191,7 +198,6 @@ app.post('/api/auth/login', (req, res) => {
   const accessToken = signJwt({ sub: user.id, email: user.email, role: user.role, tenantId: user.tenantId }, 300)
   const refreshToken = uuidv4()
   refreshTokens.set(refreshToken, { userId: user.id, ua: req.headers['user-agent'] || '' })
-  const isProd = process.env.NODE_ENV === 'production'
 
   res.cookie('refresh_token', refreshToken, { httpOnly: true, secure: isProd, sameSite: isProd ? 'None' : 'Strict', maxAge: 7*24*60*60*1000 })
   res.cookie('csrf', csrfToken, { httpOnly: false, secure: isProd, sameSite: isProd ? 'None' : 'Strict', maxAge: 7*24*60*60*1000 })
@@ -214,7 +220,6 @@ app.post('/api/auth/refresh', (req, res) => {
 
   const csrfToken = crypto.randomBytes(32).toString('hex')
   const accessToken = signJwt({ sub: user.id, email: user.email, role: user.role, tenantId: user.tenantId }, 300)
-  const isProd = process.env.NODE_ENV === 'production'
 
   res.cookie('refresh_token', newRt, { httpOnly: true, secure: isProd, sameSite: isProd ? 'None' : 'Strict', maxAge: 7*24*60*60*1000 })
   res.cookie('csrf', csrfToken, { httpOnly: false, secure: isProd, sameSite: isProd ? 'None' : 'Strict', maxAge: 7*24*60*60*1000 })
