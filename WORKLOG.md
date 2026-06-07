@@ -28,6 +28,9 @@
 **References**: PerformanceObserver resource timing entries MDN docs.  
 **Decisions**: Kept slow_api threshold at >1s per assignment (was incorrectly >500ms previously). Resource timing sampled at 10% to avoid bandwidth cost.
 
+## Note
+Cross-origin deployment constraint: The SSR middleware cookie guard works perfectly in local development (same origin) but cannot function when the frontend (Vercel) and backend (Railway) are on different domains. HttpOnly cookies are domain-scoped by the browser. In production, auth is handled entirely client-side by AuthProvider which calls /api/auth/refresh on mount — the cookie IS sent correctly to the Railway domain that set it. The trade-off is a brief loading state on page refresh instead of an instant server-side redirect.
+
 ## Tools & External References
 - Next.js 14 App Router documentation — used for parallel routes, intercepting routes, ISR revalidation patterns. All code written from scratch; docs used for API reference only.
 - WCAG 2.2 specification — used as checklist for accessibility requirements.
